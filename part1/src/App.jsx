@@ -27,12 +27,15 @@ const App = () => {
     newVotes[selected] = newVotes[selected] + 1
     setVotes(newVotes)
   }
+
   console.log('votes', votes)
 
   console.log('votes[selected]', votes[selected])
 
   return (
+  <>
   <div>
+    <h1>Anecdote of the day</h1>
     <div>{anecdotes[selected]}</div>
     <div>has {votes[selected]} votes</div>
     <div>
@@ -40,6 +43,13 @@ const App = () => {
       <button onClick={() => setSelected(getRandomInt(anecdotes.length))}>next anecdote</button>
     </div>
   </div>
+  <div>
+    <h1>Anecdote with most votes</h1>
+    {anecdotes[votes.indexOf(votes.reduce((previous, current) => {
+          return Math.max(previous, current)
+        }))]}
+  </div>
+  </>
   )
 }
 
