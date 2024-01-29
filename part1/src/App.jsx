@@ -1,64 +1,35 @@
+import { useState } from "react"
 
-const Header = (props) => {
-  //console.log(props.course)
-  return (
-    <h1>{props.course}</h1>
-  )
+const Button = ({handleClick, text}) => {
+  return (<button onClick={handleClick}>{text}</button>)
 }
 
-const Part = (props) => {
-  console.log(props);
-  return(
-    <p>{props.part} {props.exercises}</p> 
-  )
-}
-
-const Content = (props) => {
-  return (
-    <div id='content'>
-      <Part part={props.parts[0].name} exercises={props.parts[0].exercises}/>
-      <Part part={props.parts[1].name} exercises={props.parts[1].exercises}/>
-      <Part part={props.parts[2].name} exercises={props.parts[2].exercises}/>
-    </div>
-  )
-}
-
-const Total = (props) => {
-  //console.log(props)
-  return (
-  <p>
-    Number of exercises {props.total}
-  </p>
-  )
+const Statistic = ({text, value}) => {
+  return (<div>{text} {value}</div>)
 }
 
 const App = () => {
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
-  }
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
 
-  let sum = 0
-  course.parts.forEach(elem => {sum += elem.exercises})
-  console.log('sum ' + sum)
   return (
     <div>
-      <Header course={course.name}/>
-      <Content parts={course.parts}/>
-      <Total total={sum} />
+      <div>
+        <h1>give feedback</h1>
+        <Button handleClick={() => setGood(good + 1)} text='good'/>
+        <Button handleClick={() => setNeutral(neutral + 1)} text='neutral'/>
+        <Button handleClick={() => setBad(bad + 1)} text='bad'/>
+      </div>
+      <div>
+        <h1>statistics</h1>
+        <Statistic text='good' value={good}/>
+        <Statistic text='neutral' value={neutral}/>
+        <Statistic text='bad' value={bad}/>
+        
+      </div>
+
+
     </div>
   )
 }
