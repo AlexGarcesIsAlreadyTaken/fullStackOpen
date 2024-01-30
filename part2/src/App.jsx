@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Phonebook from './components/Phonebook'
-import axios from 'axios'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -10,12 +10,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
 
-  useEffect(
-    () => {
-      axios.get('http://localhost:3001/persons').then(
-        response => {setPersons(response.data)}
-      )
-    }
+  useEffect(() => {personService.getAll().then(persons => setPersons(persons))}
   , [])
 
   const addNumber = (event) => {
