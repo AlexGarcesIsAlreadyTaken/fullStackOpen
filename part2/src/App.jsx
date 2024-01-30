@@ -15,10 +15,12 @@ const App = () => {
 
   const addNumber = (event) => {
     event.preventDefault()
-    if (persons.find(person => person.name === newName) === undefined) 
-      setPersons(persons.concat({name: newName, number: newNumber, id:persons.length + 1}))
-    else alert(newName + ' is already added to phonebook')
+    const newPerson = {name: newName, number: newNumber}
+    personService.create(newPerson).then(person => {
+      setPersons(persons.concat(person))
+    })
   }
+
   const filterHandler = (event) => setFilterName(event.target.value) 
   const handleName = (event) => setNewName(event.target.value)
   const handleNumber = (event) => setNewNumber(event.target.value)
