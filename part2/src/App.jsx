@@ -3,6 +3,7 @@ import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Phonebook from './components/Phonebook'
 import personService from './services/persons'
+import axios from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -16,7 +17,15 @@ const App = () => {
   const addNumber = (event) => {
     event.preventDefault()
     const newPerson = {name: newName, number: newNumber}
-    personService.create(newPerson).then(person => {
+    const person = persons.find(person => person.name === newName)
+    if (person) {
+      console.log(person)
+      const question = `${person.name} is already added to the phone, replace the old number with a new one`
+      if (window.confirm(question)) {
+        personService.update(person.id, {...person, number: newNumber}).then(updatedPerson => setPersons(persons.map(person => (person.id === updatedPerson.id) ? updatedPerson : person)))
+      }
+    }
+    else personService.create(newPerson).then(person => {
       setPersons(persons.concat(person))
     })
   }
