@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-const Countries = ({countries}) => {
-  if (!countries) return null
-  if (countries.length > 10) return (<div>Too many matches, specify another filter</div>)
-  if (countries.length !== 1) return (
-      <div>
-        {countries.map(countrie => <div key={countrie.name.common}>{countrie.name.common}</div>)}
-      </div>
-    )
-  const countrie = countries.find(x => true)
-  console.log(countrie) 
+const Countrie = ({countrie}) => {
   const languages = Object.keys(countrie.languages) 
   const imageURL = countrie.flags.png
   const imageAlt = countrie.flags.alt
@@ -26,6 +17,40 @@ const Countries = ({countries}) => {
       <img src={imageURL} alt={imageAlt}/>
    </div>
   )
+
+}
+
+const Countries = ({countries}) => {
+
+  const [isShowable, setIsShowable] = useState()
+  
+  useEffect(
+    () => {
+      if (countries === null) return
+      setIsShowable(Array(countries.length).fill(false))
+    }
+    , [countries])
+
+  const handleShow = (index) => {
+    const aux = [...isShowable]
+    aux[index] = !aux[index]
+    console.log('isShowable', aux)
+    setIsShowable(aux)
+  }
+
+  if (!countries) return null
+  if (countries.length > 10) return (<div>Too many matches, specify another filter</div>)
+  if (countries.length !== 1) return (
+      <div>
+        {countries.map(countrie => 
+        <div key={countrie.name.common}>
+          {countrie.name.common}
+          <button onClick={() => handleShow(countries.indexOf(countrie))}>show</button>
+          {isShowable[countries.indexOf(countrie)] ? <Countrie countrie={countrie}/> : null}
+        </div>)}
+      </div>
+  )
+  return <Countrie countrie={countries.find(x => true)} />
 }
 
 const App = () => {
