@@ -1,6 +1,27 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
+const Weather = ({city}) => {
+  const [weather, setWeather] = useState(null)
+  
+  const key = '00266d2969e14c51a04215706243101'
+  const baseURL = 'http://api.weatherapi.com/v1'
+  useEffect(() => {
+    axios.get(`${baseURL}/current.json?key=${key}&q=${city}`)
+      .then(response => setWeather(response.data.current))
+    .catch(error => console.log('error type', error.response.status))
+  }, [])
+  if (weather === null) return null
+  return (
+    <div>
+      <h3>Weather in {city}</h3>
+      <div>temperature: {weather.temp_c} celsius</div>
+      <img src={`https:${weather.condition.icon}`} alt={weather.condition.text}/>
+      <div>wind: {weather.wind_kph} km/h</div>
+    </div>
+  )
+}
+
 const Countrie = ({countrie}) => {
   const languages = Object.keys(countrie.languages) 
   const imageURL = countrie.flags.png
@@ -34,7 +55,6 @@ const Countries = ({countries}) => {
   const handleShow = (index) => {
     const aux = [...isShowable]
     aux[index] = !aux[index]
-    console.log('isShowable', aux)
     setIsShowable(aux)
   }
 
@@ -42,15 +62,21 @@ const Countries = ({countries}) => {
   if (countries.length > 10) return (<div>Too many matches, specify another filter</div>)
   if (countries.length !== 1) return (
       <div>
-        {countries.map(countrie => 
-        <div key={countrie.name.common}>
-          {countrie.name.common}
-          <button onClick={() => handleShow(countries.indexOf(countrie))}>show</button>
-          {isShowable[countries.indexOf(countrie)] ? <Countrie countrie={countrie}/> : null}
+        {countries.map(country => 
+        <div key={country.name.common}>
+          {country.name.common}
+          <button onClick={() => handleShow(countries.indexOf(country))}>show</button>
+          {isShowable[countries.indexOf(country)] ? <Countrie countrie={country}/> : null}
         </div>)}
       </div>
   )
-  return <Countrie countrie={countries.find(x => true)} />
+  const country = countries.find(x => true)
+  return (
+    <div>
+      <Countrie countrie={country} />
+      <Weather city={country.capital.find(() => true)}/>
+    </div>
+  )
 }
 
 const App = () => {
