@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
   const [message, setMessage] = useState(null)
+  const [messageType, setMessageType] = useState("succesfulOperation")
 
   useEffect(() => {personService.getAll().then(persons => setPersons(persons))}
   , [])
@@ -23,16 +24,24 @@ const App = () => {
       console.log(person)
       const question = `${person.name} is already added to the phone, replace the old number with a new one`
       if (window.confirm(question)) {
-        personService.update(person.id, {...person, number: newNumber}).then(updatedPerson => {
+        personService.update(person.id, {...person, number: newNumber})
+        .then(updatedPerson => {
           setPersons(persons.map(person => (person.id === updatedPerson.id) ? updatedPerson : person))
           setMessage(`Updated ${updatedPerson.name}`)
+          setMessageType("succesfulOperation")
           setTimeout(() => setMessage(null), 2000)
-        })
+        }).catch(() => {
+            setMessage(`Information of ${person.name} has already been removed from server`)
+            setMessageType("error")
+            setTimeout(() => setMessage(null), 2000)
+            setPersons(persons.filter(personFilter => personFilter.id !== person.id))
+          })
       }
     }
     else personService.create(newPerson).then(person => {
       setPersons(persons.concat(person))
       setMessage(`Added ${person.name}`)
+      setMessageType("succesfulOperation")
       setTimeout(() => setMessage(null), 2000)
     })
   }
@@ -50,7 +59,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message}/>
+      <Notification message={message} type={messageType}/>
       <Phonebook filterName={filterName} filterHandler={filterHandler} />
       <h2>Add a new</h2>
       <PersonForm newName={newName} newNumber={newNumber} handleName={handleName} handleNumber={handleNumber} addNumber={addNumber} />
