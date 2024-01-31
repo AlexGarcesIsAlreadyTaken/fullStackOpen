@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Phonebook from './components/Phonebook'
+import Notification from './components/Notification'
 import personService from './services/persons'
-import axios from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {personService.getAll().then(persons => setPersons(persons))}
   , [])
@@ -22,11 +23,17 @@ const App = () => {
       console.log(person)
       const question = `${person.name} is already added to the phone, replace the old number with a new one`
       if (window.confirm(question)) {
-        personService.update(person.id, {...person, number: newNumber}).then(updatedPerson => setPersons(persons.map(person => (person.id === updatedPerson.id) ? updatedPerson : person)))
+        personService.update(person.id, {...person, number: newNumber}).then(updatedPerson => {
+          setPersons(persons.map(person => (person.id === updatedPerson.id) ? updatedPerson : person))
+          setMessage(`Updated ${updatedPerson.name}`)
+          setTimeout(() => setMessage(null), 2000)
+        })
       }
     }
     else personService.create(newPerson).then(person => {
       setPersons(persons.concat(person))
+      setMessage(`Added ${person.name}`)
+      setTimeout(() => setMessage(null), 2000)
     })
   }
 
@@ -43,6 +50,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message}/>
       <Phonebook filterName={filterName} filterHandler={filterHandler} />
       <h2>Add a new</h2>
       <PersonForm newName={newName} newNumber={newNumber} handleName={handleName} handleNumber={handleNumber} addNumber={addNumber} />

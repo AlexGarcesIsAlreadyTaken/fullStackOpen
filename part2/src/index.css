@@ -1,0 +1,9 @@
+.succesfulOperation {
+  color: green;
+  background: lightgrey;
+  padding: 10px;
+  font-size: 20px;
+  border: solid;
+  border-radius: 10px;
+  margin-bottom: 1em;
+}
