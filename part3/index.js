@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 
-const phonebook = [
+app.use(express.json())
+
+let phonebook = [
   { 
     "id": 1,
     "name": "Arto Hellas", 
@@ -47,6 +49,34 @@ app.get('/info', (req, res) => {
   const date = new Date()
   console.log(date)
   res.send(`<p>Phonebook has info for ${phonebook.length} people</p><p>${date}</p>`)
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const person = phonebook.find(person => person.id === id)
+  console.log('delete', person)
+
+  res.statusMessage = "person deleted"
+  res.status(204).end()
+  phonebook = phonebook.filter(person => person.id !== id)
+})
+
+app.post('/api/persons', (req, res) => {
+  const newPerson = req.body
+  if (!newPerson.number || !newPerson.name) {
+    const errorMessage = "missing number, name or both"
+    res.status(400).json({error: errorMessage})
+    return
+  }
+  if (phonebook.find(person => person.name === newPerson.name)) {
+    const errorMessage = `${newPerson.name} is already on the phonebook`
+    res.status(409).json({error: errorMessage})
+    return
+  }
+  let id = 1
+  while (phonebook.find(person => person.id === id)) id = Math.floor(Math.random()*10000000)
+  phonebook = phonebook.concat({...newPerson, id})
+  res.status(204).end()
 })
 
 const PORT = 3001
