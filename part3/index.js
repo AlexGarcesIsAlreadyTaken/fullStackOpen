@@ -1,7 +1,20 @@
 const express = require('express')
+var morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+app.use(morgan('tiny', {
+  skip: (req, res) => {return req.method === "POST"}
+}))
+
+morgan.token('post', (req, res) => {
+  console.log(req.body)
+  return JSON.stringify(req.body)
+})
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post', {
+  skip: (req, res) => {return req.method !== "POST"}
+}))
 
 let phonebook = [
   { 
@@ -37,7 +50,6 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = phonebook.find(person => person.id === id)
-  console.log(person)
   if (person) res.json(person)
   else {
     res.statusMessage = `person with id ${id} not exist`
@@ -47,14 +59,12 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.get('/info', (req, res) => {
   const date = new Date()
-  console.log(date)
   res.send(`<p>Phonebook has info for ${phonebook.length} people</p><p>${date}</p>`)
 })
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = phonebook.find(person => person.id === id)
-  console.log('delete', person)
 
   res.statusMessage = "person deleted"
   res.status(204).end()
@@ -78,6 +88,7 @@ app.post('/api/persons', (req, res) => {
   phonebook = phonebook.concat({...newPerson, id})
   res.status(204).end()
 })
+
 
 const PORT = 3001
 app.listen(PORT, () => {console.log(`Server running in port ${PORT}`)})
